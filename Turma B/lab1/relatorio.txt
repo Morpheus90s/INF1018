@@ -1,0 +1,7 @@
+O comando ./ex1 é necessário para especificar o diretório corrente.
+O programa utiliza argc para a contagem de argumentos e argv como um
+vetor de strings para capturar os dados passados na linha de comando. 
+No caso do ex3,o erro ocorre porque a falta do protótipo da função faz com que o compilador assuma
+o tipo de retorno padrão (int) em vez de float. 
+Já no exercício 4, a função dump imprime o conteúdo da memória byte a byte a partir de um endereço específico.
+Os resultados revelam que um char ocupa 1 byte e um int ocupa 4 bytes, sendo este último armazenado em formato Little Endian.
