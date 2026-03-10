@@ -1,0 +1,10 @@
+Ao executar a função dump, observamos que ele ocupa 4 bytes. Sendo organizado por Little Endian,
+por exemplo, o valor hexadecimal 0x2710 aparece como 10 27 00 00.
+Ao testar com long e short, notamos que ocupam 8 bytes e 2 bytes.
+No caso do tipo char, que ocupa 1 byte, o valor exibido para o caractere 'a' foi 61 em hexadecimal.
+Para a string "7509", o dump mostrou a ocupação de 5 bytes.
+A função string2num converte uma sequência de caracteres numéricos em um valor inteiro.
+A cada iteração, a expressão (*s - '0') subtrai o valor ASCII do caractere '0' do caractere atual,
+resultando no dígito numérico real. A variável acumuladora a é multiplicada pela base e somada ao novo dígito,
+deslocando os algarismos para a esquerda.
+A função foi modificada para tratar letras de 'a' a 'z' como dígitos de 10 a 35, permitindo converter números em bases de até 36.
