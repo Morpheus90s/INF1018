@@ -1,0 +1,4 @@
+Para identificar a organização da memória, implementei uma função que verifica a posição do byte menos significativo.
+utilizei um ponteiro unsigned char * para inspecionar a memória byte a byte.
+Ao atribuir o valor 1 (0x00000001) à variável, verifiquei se o primeiro byte armazenado era o valor 1,
+sendo Little-endian.

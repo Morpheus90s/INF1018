@@ -1,0 +1,7 @@
+Questão 1: Para isolar o byte menos significativo, utilizei a máscara 0x000000FF com o operador AND.
+Para setar o byte mais significativo como FF, utilizei a máscara 0xFF000000 com o operador OR, preservando os demais bits.
+Questão 2: A função odd_ones percorre o inteiro bit a bit via deslocamento à direita.
+O uso do operador % foi substituído por count & 1, que verifica se o bit de menor peso do contador está ativo (indicando número ímpar).
+Questão 3:No switch_byte, dividi o byte em dois blocos de 4 bits (nibbles)
+usando shifts e os reuni de forma invertida. No rotate_left, combinei o deslocamento à esquerda
+com um deslocamento à direita de 8-n para recuperar os bits que seriam descartados, garantindo a circularidade.
