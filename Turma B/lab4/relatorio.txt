@@ -1,0 +1,5 @@
+A maior dificuldade foi converter manualmente valores negativos para complemento a 2,
+como o -151, e entender como o Little Endian inverte a ordem dos bytes no dump.
+Na questão do xbyte, apanhei para fazer a extensão de sinal corretamente;
+percebi que não bastava isolar o byte. Nas comparações de int com unsigned,
+entendi que o C prioriza o tipo sem sinal, o que gera resultados contra-intuitivos (como -1 ser maior que 2).
