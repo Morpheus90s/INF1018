@@ -1,0 +1,9 @@
+Neste laboratório, analisei a organização de memória em C,
+focando em alinhamento e padding. Através da função dump,
+confirmei que o compilador armazena dados em Little Endian e insere bytes de preenchimento
+para que tipos maiores, como int e long, comecem em endereços múltiplos de seu tamanho,
+otimizando o acesso da CPU. Notei que a ordem dos campos em structs como X2 e X4 altera
+drasticamente o tamanho final devido a esses alinhamentos.
+Já as unions mostraram que todos os membros compartilham o mesmo endereço inicial,
+ocupando o espaço do maior elemento. Concluí que o layout da memória é uma combinação
+de regras de arquitetura e eficiência do compilador.
