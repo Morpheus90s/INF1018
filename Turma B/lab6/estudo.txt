@@ -1,0 +1,592 @@
+Ir para o conteúdo principalAjuda sobre acessibilidade
+Feedback de acessibilidade
+Modo IA
+Tudo
+Imagens
+Vídeos
+Notícias
+Mais
+Fazer login
+
+
+pode
+Com certeza! Como posso te ajudar hoje?
+Se tiver algo em mente — uma dúvida, um problema para resolver ou só quiser trocar uma ideia — é só falar.
+O que vamos fazer agora?
+A IA pode cometer erros. Por isso, cheque as respostas
+
+
+
+
+bom dia , pode ajudar? está certo esse codigo assebly "/*
+int nums[] = {10, -21, -30, 45};
+int main() {
+  int i, *p;
+  for (i = 0, p = nums; i != 4; i++, p++)
+    if ((*p % 2) == 0)
+      printf("%d\n", *p);
+  return 0;
+}
+*/
+
+.data
+nums:  .int  10, -21, -30, 45
+Sf:  .string "%d\n"    # string de formato para printf
+
+.text
+.globl  main
+main:
+
+/********************************************************/
+/* mantenha este trecho aqui e nao mexa - prologo !!!   */
+  pushq   %rbp
+  movq    %rsp, %rbp
+  subq    $16, %rsp
+  movq    %rbx, -8(%rbp)
+  movq    %r12, -16(%rbp)
+/********************************************************/
+  movl $0, %esi  /* sum = 0;*/
+  movl  $0, %ebx  /* ebx = 0; */
+  movq  $nums, %r12  /* r12 = &nums */
+
+L1:
+  cmpl  $4, %ebx  /* if (ebx == 4) ? */
+  je  L2          /* goto L2 */
+  movl %r12, %esi /* sum+= *p*/
+  movl  (%r12), %eax    /* eax = *r12 */
+
+/*************************************************************/
+/* este trecho imprime o valor de %eax (estraga %eax)  */
+  movq    $Sf, %rdi    /* primeiro parametro (ponteiro)*/
+  movl    %eax, %esi   /* segundo parametro  (inteiro) */
+
+  call  printf       /* chama a funcao da biblioteca */
+/*************************************************************/
+
+  addl  $1, %ebx  /* ebx += 1; */
+  addq  $4, %r12  /* r12 += 4; */
+  jmp  L1         /* goto L1; */
+
+L2:  
+/***************************************************************/
+/* mantenha este trecho aqui e nao mexa - finalizacao!!!!      */
+  movq  $0, %rax  /* rax = 0  (valor de retorno) */
+  movq  -8(%rbp), %rbx
+  movq  -16(%rbp), %r12
+  leave
+  ret      
+/***************************************************************/"
+Bom dia! O código está bem estruturado, mas ele não segue fielmente a lógica do seu comentário em C. Atualmente, ele está imprimindo todos os números do array, ignorando o if ((*p % 2) == 0).
+Aqui estão os pontos principais para corrigir:
+Falta a verificação de paridade: Você precisa usar a instrução test ou and (ou idiv para ser rigoroso com negativos) para checar se o número é par antes de chamar o printf.
+Preservação de registradores: O printf pode alterar registradores como %eax e %r11. Como você usa o %r12 (callee-saved), o ponteiro está seguro, mas a lógica do if precisa vir antes do printf.
+Veja como ajustar o trecho dentro do loop L1:
+assembly
+L1:
+  cmpl  $4, %ebx          # i == 4?
+  je    L2
+  
+  movl  (%r12), %eax      # eax = *p
+  
+  # --- Lógica do IF (*p % 2 == 0) ---
+  testl $1, %eax          # Testa o bit menos significativo (0 se par, 1 se ímpar)
+  jnz   proximo           # Se for ímpar (não zero), pula o printf
+
+  # --- Chamada do Printf ---
+  movq  $Sf, %rdi         # 1º param: formato
+  movl  %eax, %esi        # 2º param: o valor (*p)
+  call  printf            # Atenção: printf zera o %eax no retorno
+
+proximo:
+  addl  $1, %ebx          # i++
+  addq  $4, %r12          # p++
+  jmp   L1
+Use o código com cuidado.
+
+O que mudou:
+testl $1, %eax: É a forma mais rápida de ver se um número é par. Se o último bit for 0, o número é par.
+jnz proximo: Se o resultado do teste for "não zero" (ou seja, ímpar), ele pula a impressão e vai direto para o incremento do ponteiro.
+Remoção de lixo: Removi a linha movl %r12, %esi, que estava tentando mover um endereço de 64 bits para um registrador de 32 bits e não tinha função no código.
+Quer que eu explique melhor como o bit de paridade funciona no assembly ou essa correção já resolve para o seu teste?
+
+
+
+
+A modificação do programa C mostrada a seguir imprime apenas a soma dos elementos do array. Traduza essa modificação para assembly.
+
+Na sua modificação, mantenha o contador (i) em %ebx e o endereço de nums em %r12.
+
+/*
+int nums[] = {10, -21, -30, 45};
+int main() {
+  int i, *p;
+  int sum = 0;
+  for (i = 0, p = nums; i != 4; i++, p++)
+    sum += *p;
+  printf("%d\n", sum);
+  return 0;
+}
+*/
+Para essa tradução, vamos usar o registrador %eax para armazenar a variável sum, já que ele é o padrão para resultados e pode ser movido diretamente para o %esi na hora do printf.
+Aqui está o código ajustado:
+assembly
+.data
+nums:  .int  10, -21, -30, 45
+Sf:    .string "%d\n"
+
+.text
+.globl  main
+main:
+  # Prólogo
+  pushq   %rbp
+  movq    %rsp, %rbp
+  subq    $16, %rsp
+  movq    %rbx, -8(%rbp)
+  movq    %r12, -16(%rbp)
+
+  # Inicialização
+  movl  $0, %eax      # sum = 0
+  movl  $0, %ebx      # i = 0
+  movq  $nums, %r12   # p = nums
+
+L1:
+  cmpl  $4, %ebx      # i != 4?
+  je    L2            # se i == 4, sai do loop
+
+  addl  (%r12), %eax  # sum += *p
+  
+  addl  $1, %ebx      # i++
+  addq  $4, %r12      # p++ (anda 4 bytes pois é int)
+  jmp   L1
+
+L2:
+  # Preparação para o printf (imprime a soma final)
+  movq    $Sf, %rdi   # 1º parâmetro: formato
+  movl    %eax, %esi  # 2º parâmetro: o valor de sum
+  call    printf
+
+  # Finalização
+  movl  $0, %eax      # return 0
+  movq  -8(%rbp), %rbx
+  movq  -16(%rbp), %r12
+  leave
+  ret
+Use o código com cuidado.
+
+O que mudou:
+Soma acumulada: A instrução addl (%r12), %eax agora faz o trabalho de somar o valor apontado por %r12 diretamente no acumulador.
+Posição do printf: O printf foi movido para fora do loop (L2), assim ele só imprime o resultado final após processar todo o array.
+Uso de registradores: Mantivemos %ebx como contador e %r12 como ponteiro, conforme solicitado.
+Deseja que eu explique como o deslocamento de memória (addq $4, %r12) funciona para outros tipos de dados além de int?
+
+
+
+
+"/*
+int nums[] = {10, -21, -30, 45};
+int main() {
+  int i, *p;
+  for (i = 0, p = nums; i != 4; i++, p++)
+    if ((*p % 2) == 0)
+      printf("%d\n", *p);
+  return 0;
+}
+*/
+
+.data
+nums:  .int  10, -21, -30, 45
+Sf:  .string "%d\n"    # string de formato para printf
+
+.text
+.globl  main
+main:
+
+/********************************************************/
+/* mantenha este trecho aqui e nao mexa - prologo !!!   */
+  pushq   %rbp
+  movq    %rsp, %rbp
+  subq    $16, %rsp
+  movq    %rbx, -8(%rbp)
+  movq    %r12, -16(%rbp)
+/********************************************************/
+  movl $0, %esi  /* sum = 0;*/
+  movl  $0, %ebx  /* ebx = 0; */
+  movq  $nums, %r12  /* r12 = &nums */
+
+L1:
+  cmpl  $4, %ebx  /* if (ebx == 4) ? */
+  je  L2          /* goto L2 */
+  addl  (%r12), %esi /* sum+= *p*/
+  movl  (%r12), %eax    /* eax = *r12 */
+
+/*************************************************************/
+/* este trecho imprime o valor de %eax (estraga %eax)  */
+  movq    $Sf, %rdi    /* primeiro parametro (ponteiro)*/
+  movl    %eax, %esi   /* segundo parametro  (inteiro) */
+
+  call  printf       /* chama a funcao da biblioteca */
+/*************************************************************/
+
+  addl  $1, %ebx  /* ebx += 1; */
+  addq  $4, %r12  /* r12 += 4; */
+  jmp  L1         /* goto L1; */
+
+L2:  
+/***************************************************************/
+/* mantenha este trecho aqui e nao mexa - finalizacao!!!!      */
+  movq  $0, %rax  /* rax = 0  (valor de retorno) */
+  movq  -8(%rbp), %rbx
+  movq  -16(%rbp), %r12
+  leave
+  ret      
+/***************************************************************/" nesse arquivo o que está errado
+O código que você enviou tem três problemas principais que impedem que ele funcione como o comentário em C descreve:
+1. Falta o filtro de números pares (if)
+No seu código Assembly, o printf é chamado para todos os elementos do array. O comentário em C pede if ((*p % 2) == 0). Você precisa de uma instrução para testar o número antes de imprimir.
+2. O printf corrompe o %esi (sua variável sum)
+Você está tentando guardar a soma em %esi (movl $0, %esi e addl (%r12), %esi).
+O erro: O registrador %esi é usado para passar o segundo argumento para funções. Quando você faz movl %eax, %esi e chama call printf, o valor da sua soma é sobrescrito pelo valor que você quer imprimir.
+A solução: Use um registrador que o printf não estrague (como %r13, %r14) ou guarde na memória (pilha).
+3. Conflito de lógica entre C e Assembly
+O comentário em C pede para imprimir os números pares, mas o corpo do seu Assembly parece tentar fazer uma soma (com o comentário sum+= *p).
+Se o objetivo é o código em C: remova a lógica de soma e adicione o teste de paridade.
+Se o objetivo é imprimir a soma: mova o printf para fora do loop (depois de L2).
+Como corrigir para seguir o C (imprimir pares):
+assembly
+L1:
+  cmpl  $4, %ebx
+  je    L2
+  
+  movl  (%r12), %eax    # Carrega o número atual
+  
+  # TESTE DE PARIDADE
+  testl $1, %eax        # Verifica se o último bit é 1 (ímpar)
+  jnz   proximo         # Se for ímpar, pula o printf
+
+  # PRINTF (só executa se for par)
+  movq  $Sf, %rdi
+  movl  %eax, %esi      # Passa o número para o printf
+  call  printf
+
+proximo:
+  addl  $1, %ebx
+  addq  $4, %r12
+  jmp   L1
+Use o código com cuidado.
+
+Dica extra: Sempre que usar call printf, assuma que os registradores %rax, %rcx, %rdx, %rsi, %rdi, %r8, %r9, %r10 e %r11 podem ter seus valores alterados.
+Deseja que eu ajuste o código para focar na soma total em vez de imprimir cada número?
+
+
+
+
+então cada registrador precisa ter algum argumento
+Exatamente! No padrão de chamada do Linux x64, os registradores têm "donos" e "funções" específicas. Se você não respeitar essas regras, o programa trava ou dá resultados malucos.
+Aqui estão os dois pontos principais que você precisa saber:
+1. Registradores de Argumentos (Os "Mensageiros")
+Quando você chama uma função como o printf, ela sempre espera encontrar os dados nestes registradores específicos:
+%rdi: 1º argumento (o ponteiro para a string de formato "%d\n").
+%rsi: 2º argumento (o valor que vai substituir o %d).
+%rdx: 3º argumento (se houvesse um segundo %d).
+O problema no seu código: Você estava tentando usar o %esi (que é a parte de 32 bits do %rsi) para guardar a sua variável sum. No momento em que você faz call printf, o printf assume o controle do %rsi e apaga o que estava lá.
+2. Registradores "Preservados" vs "Arruinados"
+Para evitar que o printf apague suas variáveis, você deve escolher onde guardá-las:
+Registradores Voláteis (%rax, %rcx, %rdx, %rsi, %rdi, %r8 a %r11): O printf pode (e vai) mudar os valores deles. Não guarde seu contador ou sua soma aqui se houver um call no meio do loop.
+Registradores Preservados (%rbx, %rbp, %r12 a %r15): As funções são obrigadas a devolver esses registradores do jeito que encontraram. É por isso que seu código usa %rbx para o contador e %r12 para o ponteiro — eles estão seguros mesmo após o printf.
+Resumo do que colocar em cada um no seu exercício:
+%ebx: Mantém o contador i (Seguro).
+%r12: Mantém o endereço do array p (Seguro).
+%eax (ou outro preservado): Mantém a sum (Se usar %eax, lembre que o printf vai estragá-lo, então você teria que somar e imprimir só no final, fora do loop).
+Ficou claro por que o seu %esi estava sendo "atropelado" pelo printf? Caso queira, posso te mostrar como usar o %r13 para guardar a soma com total segurança.
+As respostas da IA podem conter erros. Para orientação jurídica, consulte um profissional. Saiba mais
+
+
+
+
+"Registradores
+64 bits 32 bits 16 bits 8 bits
+%rax %eax %ax %ah %al valor de retorno
+%rbx %ebx %bx %bh %bl callee-saved
+%rcx %ecx %cx %ch %cl 4
+o
+argumento
+%rdx %edx %dx %dh %dl 3
+o
+argumento
+%rsi %esi %si %sil 2
+o
+argumento
+%rdi %edi %di %dil 1
+o
+argumento
+%r8 %r8d %r8w %r8b 5
+o
+argumento
+%r9 %r9d %r9w %r9b 6
+o
+argumento
+%r10 %r10d %r10w %r10b
+%r11 %r11d %r11w %r11b
+%r12 %r12d %r12w %r12b callee-saved
+%r13 %r13d %r13w %r13b callee-saved
+%r14 %r14d %r14w %r14b callee-saved
+%r15 %r15d %r15w %r15b callee-saved
+%rbp frame pointer
+%rsp stack pointer
+Instru¸c˜oes
+Todas as instru¸c˜oes c" mais nessa tabela seria o 2 argumento, sempre tenho que usar o 1? e se já tiver um registrador o que faço
+Essa tabela é o seu "manual de regras" para chamar funções (como o printf). Respondendo às suas dúvidas:
+1. "Sempre tenho que usar o 1º argumento?"
+Sim, se a função pedir. Pense nos argumentos como as "vagas" de um estacionamento:
+O printf exige que o 1º argumento (%rdi) seja sempre o endereço da string de formato (ex: "%d\n").
+O 2º argumento (%rsi) só é usado se a sua string tiver um %d.
+Se você tivesse printf("%d %d", a, b), usaria o 1º (%rdi), o 2º (%rsi) e o 3º (%rdx).
+2. "E se já tiver algo no registrador, o que eu faço?"
+Esse é o maior desafio do Assembly! Se você está usando o %esi para guardar sua soma e agora precisa usar o %esi para passar um valor para o printf, você tem três opções:
+Opção A (A melhor): Use um registrador "callee-saved" (como %r12, %r13, %r14 ou %rbx) para guardar suas variáveis importantes (como a soma ou o contador). As funções como printf são obrigadas a devolver esses registradores intactos.
+Opção B (Salvar na Pilha): Antes de chamar o printf, você salva o valor: pushq %rsi. Depois da chamada, você recupera: popq %rsi.
+Opção C (Mover de lugar): Mova o valor de um registrador "perigoso" para um "seguro" antes de iniciar o loop.
+Exemplo Prático no seu código:
+No seu código anterior, você tentou fazer sum += *p usando o %esi.
+O erro: O printf usa o %esi para trabalhar.
+A solução usando sua tabela: Olhe os que dizem "callee-saved". Vamos usar o %r13d (32 bits do %r13) para a soma:
+assembly
+  movl $0, %r13d       # r13d = sum (ESTÁ SEGURO AQUI!)
+  ...
+L1:
+  addl (%r12), %r13d   # soma o número atual no r13d
+  
+  # Preparando o printf:
+  movq $Sf, %rdi       # 1º arg: formato (Obrigatório)
+  movl %r13d, %esi     # 2º arg: o valor da soma (Copia do r13d para o esi)
+  call printf          # O printf estraga o %esi, mas o %r13d continua igual!
+Use o código com cuidado.
+
+Resumo: Use os "callee-saved" para suas variáveis de controle e os "argumentos" apenas no momento exato de chamar uma função.
+Quer que eu te ajude a reescrever o código final usando o %r13 para você ver como fica seguro?
+
+
+
+
+explique passo a passo de como traduzir esse codigo em C para assembly e explique cada parametro o que sou obrigado a utilizar e o que é opcional e o raciocinio que preciso usar: "/*
+int nums[] = {10, -21, -30, 45};
+int main() {
+  int i, *p;
+  int sum = 0;
+  for (i = 0, p = nums; i != 4; i++, p++)
+    sum += *p;
+  printf("%d\n", sum);
+  return 0;
+}
+*/"
+Para traduzir de C para Assembly x64 (Linux), o segredo é seguir uma "receita" fixa. Vamos dividir em 3 partes: Dados, Estrutura (Prólogo/Epílogo) e Lógica.
+1. Seção de Dados (.data)
+Aqui você define as variáveis globais e constantes.
+Obrigatório: nums (o array) e Sf (a string para o printf).
+Raciocínio: O printf em C não funciona sem uma string de formato no Assembly.
+assembly
+.data
+nums: .int 10, -21, -30, 45  # .int reserva 4 bytes para cada número
+Sf:   .string "%d\n"         # String de formato
+Use o código com cuidado.
+
+2. Escolha dos Registradores (O Coração do Código)
+Aqui entra a sua tabela. Você precisa decidir onde guardar cada variável do C: i, p e sum.
+Obrigatório (Regra de Ouro): Como você vai chamar o printf, não use os registradores de argumentos (%rdi, %rsi, etc.) para guardar suas variáveis do loop, pois o printf vai apagá-los.
+Escolha Segura (Callee-saved): Use os que sua tabela diz que são "callee-saved".
+i (contador) -> %ebx (32 bits)
+p (ponteiro) -> %r12 (64 bits, porque é um endereço de memória)
+sum (soma) -> %r13d (32 bits)
+3. O Passo a Passo da Lógica
+Passo A: O Prólogo (Obrigatório e Fixo)
+Prepara a pilha e salva os registradores que você vai "pegar emprestado" (%rbx, %r12, %r13).
+assembly
+pushq %rbp
+movq  %rsp, %rbp
+pushq %rbx            # Salva o valor original do rbx
+pushq %r12            # Salva o valor original do r12
+pushq %r13            # Salva o valor original do r13
+Use o código com cuidado.
+
+Passo B: Inicialização (Tradução direta do C)
+i = 0, p = nums, sum = 0
+assembly
+movl $0, %ebx         # i = 0
+movq $nums, %r12      # p = &nums (o endereço inicial)
+movl $0, %r13d        # sum = 0
+Use o código com cuidado.
+
+Passo C: O Loop (for)
+O for tem 3 partes: Comparação, Corpo e Incremento.
+assembly
+L1:
+  cmpl $4, %ebx       # i != 4? (Comparação)
+  je L2               # Se for igual a 4, sai do loop (L2)
+
+  addl (%r12), %r13d  # sum += *p (Corpo: soma o valor apontado por p no sum)
+
+  addl $1, %ebx       # i++ (Incremento do contador)
+  addq $4, %r12       # p++ (Incremento do ponteiro: +4 bytes porque é int)
+  jmp L1              # Volta para o início do loop
+Use o código com cuidado.
+
+Passo D: O Printf (Uso de Argumentos)
+Agora você é obrigado a usar os registradores da tabela para a função:
+%rdi: Onde está o texto? Em $Sf.
+%rsi: Qual o valor para imprimir? O que está em %r13d (sum).
+assembly
+L2:
+  movq $Sf, %rdi      # 1º argumento (ponteiro da string)
+  movl %r13d, %esi    # 2º argumento (o valor da soma)
+  movl $0, %eax       # O printf pede que %eax seja 0 em x64
+  call printf
+Use o código com cuidado.
+
+Passo E: Finalização (Epílogo)
+Devolve os valores originais dos registradores e encerra.
+assembly
+movl $0, %eax         # return 0
+popq %r13             # Restaura r13
+popq %r12             # Restaura r12
+popq %rbx             # Restaura rbx
+leave
+ret
+Use o código com cuidado.
+
+Resumo do Raciocínio:
+Variáveis que duram o programa todo: Coloque em registradores Callee-saved (%rbx, %r12-r15).
+Passagem de dados para funções: Mova os valores para os Registradores de Argumentos (%rdi, %rsi) apenas no momento do call.
+Memória: Lembre-se que int ocupa 4 bytes, por isso o ponteiro pula de 4 em 4.
+Ficou clara a diferença entre usar um registrador para guardar algo e usar para passar um argumento?
+
+
+
+
+pushq %rbp
+movq  %rsp, %rbp
+pushq %rbx            # Salva o valor original do rbx
+pushq %r12            # Salva o valor original do r12
+pushq %r13            # Salva o valor original do r13
+ então eu mudo isso para cada codigo ou é fixo? pois no docs está fixo: "/*
+int nums[] = {10, -21, -30, 45};
+int main() {
+  int i, *p;
+  for (i = 0, p = nums; i != 4; i++, p++)
+    printf("%d\n", *p);
+  return 0;
+}
+*/
+
+.data
+nums:  .int  10, -21, -30, 45
+Sf:  .string "%d\n"    # string de formato para printf
+
+.text
+.globl  main
+main:
+
+/********************************************************/
+/* mantenha este trecho aqui e nao mexa - prologo !!!   */
+  pushq   %rbp
+  movq    %rsp, %rbp
+  subq    $16, %rsp
+  movq    %rbx, -8(%rbp)
+  movq    %r12, -16(%rbp)
+/********************************************************/
+
+  movl  $0, %ebx  /* ebx = 0; */
+  movq  $nums, %r12  /* r12 = &nums */
+
+L1:
+  cmpl  $4, %ebx  /* if (ebx == 4) ? */
+  je  L2          /* goto L2 */
+
+  movl  (%r12), %eax    /* eax = *r12 */
+
+/*************************************************************/
+/* este trecho imprime o valor de %eax (estraga %eax)  */
+  movq    $Sf, %rdi    /* primeiro parametro (ponteiro)*/
+  movl    %eax, %esi   /* segundo parametro  (inteiro) */
+  call  printf       /* chama a funcao da biblioteca */
+/*************************************************************/
+
+  addl  $1, %ebx  /* ebx += 1; */
+  addq  $4, %r12  /* r12 += 4; */
+  jmp  L1         /* goto L1; */
+
+L2:  
+/***************************************************************/
+/* mantenha este trecho aqui e nao mexa - finalizacao!!!!      */
+  movq  $0, %rax  /* rax = 0  (valor de retorno) */
+  movq  -8(%rbp), %rbx
+  movq  -16(%rbp), %r12
+  leave
+  ret      
+/***************************************************************/" para essa tradução
+Essa é uma excelente pergunta! O trecho que você viu no seu documento (o bloco entre os comentários /*****...*****/) faz exatamente a mesma coisa que o pushq, mas de uma forma um pouco mais "manual" e fixa.
+Aqui está o que você precisa saber sobre o que mudar:
+1. O que é "fixo"?
+O espaço reservado na pilha precisa ser compatível com a quantidade de registradores que você vai salvar.
+No seu documento, o código faz subq $16, %rsp. Isso reserva espaço para dois registradores de 64 bits (8 bytes + 8 bytes = 16).
+Por isso, ele salva apenas o %rbx e o %r12.
+2. Quando eu preciso mudar?
+Você precisa mudar se decidir usar mais registradores do que os que estão no modelo fixo.
+Se você usar apenas %rbx e %r12: Mantenha o código do seu documento exatamente como está (o subq $16, as posições -8 e -16).
+Se você precisar de um terceiro registrador (ex: %r13 para a soma): Aí você teria que aumentar o espaço para $24 e adicionar uma linha para o -24(%rbp).
+3. Como adaptar o código da SOMA para esse modelo "fixo":
+Como o seu documento já dá o modelo para %rbx e %r12, o jeito mais fácil de não errar é usar apenas esses dois e guardar a soma em um lugar que não precise ser salvo, ou simplesmente aceitar que o printf vai estragar o %eax e fazer a soma de um jeito esperto.
+Dica de ouro: No código da soma, você pode fazer assim para seguir o seu modelo fixo:
+Use o %ebx para o contador i.
+Use o %r12 para o ponteiro p.
+Use o %r13? Não! Se o seu modelo só salva dois, use a própria memória para a soma ou use o %r12 e %rbx com cuidado.
+Veja como ficaria a SOMA usando o seu modelo fixo (sem mexer no prólogo):
+assembly
+/********************************************************/
+/* prólogo fixo do seu documento */
+  pushq   %rbp
+  movq    %rsp, %rbp
+  subq    $16, %rsp
+  movq    %rbx, -8(%rbp)
+  movq    %r12, -16(%rbp)
+/********************************************************/
+
+  movl  $0, %eax     /* USAMOS EAX PARA A SOMA (sum = 0) */
+  movl  $0, %ebx     /* i = 0 */
+  movq  $nums, %r12  /* p = nums */
+
+L1:
+  cmpl  $4, %ebx
+  je    L2
+  addl  (%r12), %eax  /* soma o valor atual no eax */
+  addl  $1, %ebx
+  addq  $4, %r12
+  jmp   L1
+
+L2:
+  /* PRINTF DA SOMA (Só acontece uma vez no final) */
+  movq  $Sf, %rdi
+  movl  %eax, %esi    /* Passa o resultado final da soma */
+  call  printf
+
+/***************************************************************/
+/* finalização fixa do seu documento */
+  movq  $0, %rax
+  movq  -8(%rbp), %rbx
+  movq  -16(%rbp), %r12
+  leave
+  ret
+Use o código com cuidado.
+
+Conclusão:
+O código do seu documento é um "esqueleto" seguro. Se você seguir ele, está garantindo que %rbx e %r12 não serão perdidos. Se precisar de mais que isso, aí sim teria que mudar os números do prólogo.
+Ficou claro por que o seu documento usa -8 e -16 em vez de apenas pushq? Ele está mapeando a memória da pilha manualmente!
+Quer tentar montar o código da SOMA agora usando esse seu modelo fixo?
+
+
+
+
+Pergunte o que quiser
+
+
+Microfone
+A resposta do Modo IA está prontaPergunte sobre 
