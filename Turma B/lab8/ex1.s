@@ -15,8 +15,6 @@ s1: .string "ls -ls"
     pushq %rbp              
     movq  %rsp, %rbp      
 
-  /* coloque seu codigo aqui */
-
     leaq  s1(%rip), %rdi  
 
     call  system       
