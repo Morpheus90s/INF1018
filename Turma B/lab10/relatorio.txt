@@ -1,0 +1,8 @@
+Na implementação da função recursiva add2 e da função boo, o erro mais crítico foi
+esquecer inicializar o alinhamento da pilha;
+o `%rsp` seja múltiplo de 16 antes de qualquer `call`,
+caso contrário, ocorrem falhas de execução
+Chamar funções como f, devo obrigatoriamente salvar registradores callee-saved
+(%rbx, %r12-%r15) 
+A aplicação correta do prólogo e do epílogo (leave),
+somada ao uso de deslocamentos negativos a partir de %rbp...
