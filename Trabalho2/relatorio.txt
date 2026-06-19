@@ -1,0 +1,45 @@
+Trabalho 2 - Gerador Dinamico de Funcoes
+Aluno: Pedro Augusto Beserra da Silva (2321374)  Turma: 3WC
+ 
+Como fiz:
+Fui montando a cria_func aos poucos, testando cada parte separada antes de juntar tudo.
+Comecei so com o prologo/epilogo, depois fui adicionando PARAM, depois FIX, depois IND.
+Cada vez que eu adicionava uma parte nova eu rodava os testes de novo pra ver se nao
+tinha quebrado o que ja funcionava.
+ 
+O que deu mais trabalho no comeco foi entender que os registradores de entrada da funcao
+gerada (%rdi, %rsi, %rdx) nao necessariamente vao pros mesmos lugares na chamada da
+funcao original. Por exemplo, se o parametro 0 da funcao original e FIX e o parametro 1
+e PARAM, o argumento que a funcao gerada recebe em %rdi precisa ir pra %rsi na chamada
+de f. Na minha primeira tentativa eu tava sobrescrevendo o registrador antes de usar o
+valor dele em outro lugar, e o resultado saia errado (tipo, multiplicando o valor errado
+por 10 no teste do mult). Resolvi salvando os 3 possiveis parametros de entrada na pilha
+logo no comeco (-8, -16, -24(%rbp)) e dali pra frente so leio da pilha pra montar os
+argumentos da chamada, isso resolveu o problema de sobrescrita.
+ 
+O que esta funcionando:
+prologo/epilogo com pilha alinhada em 16 bytes (precisa disso pra chamar funcao de
+biblioteca tipo memcmp sem dar segfault)
+parametro tipo PARAM (repassado), tanto inteiro quanto ponteiro
+parametro tipo FIX, inteiro (movl 32 bits) e ponteiro (movabsq 64 bits)
+parametro tipo IND, le o valor atual da variavel (testei mudando o valor da variavel
+entre duas chamadas e confirmei que pega o valor novo, nao um valor "congelado")
+testei com 1, 2 e 3 parametros, em combinacoes diferentes
+usei os exemplos do enunciado (mult e memcmp) e tambem um caso meu com 3 parametros
+inteiros (a + b*10 + c*100) pra testar combinacao de FIX com PARAM
+ 
+Rodei o teste.c e deu isso:
+ 
+[OK]    3 parametros, todos PARAM -> 321
+[OK]    FIX + PARAM + PARAM -> 235
+[OK]    IND (variavel) + FIX -> 70
+[OK]    IND (variavel atualizada) + FIX -> 420
+[OK]    memcmp prefixo igual (n=12) -> 0
+[OK]    memcmp prefixo diferente -> 4
+[OK]    IND ponteiro + FIX ponteiro + FIX int -> 0
+Resumo: 7/7 testes passaram
+ 
+O que nao funciona / limitacoes:
+Nos casos que testei nao achei nenhum erro. Nao testei tipos de parametro fora do que
+o cria_func.h define (so INT_PAR e PTR_PAR), entao nao sei dizer se funcionaria com
+outro tipo de dado, mas isso tambem nao era pedido no trabalho.
