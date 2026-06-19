@@ -18,7 +18,7 @@ logo no comeco (-8, -16, -24(%rbp)) e dali pra frente so leio da pilha pra monta
 argumentos da chamada, isso resolveu o problema de sobrescrita.
  
 O que esta funcionando:
-prologo/epilogo com pilha alinhada em 16 bytes (precisa disso pra chamar funcao de
+prologo/epilogo com pilha alinhada, alocando 32 bytes(chama a funcao de
 biblioteca tipo memcmp sem dar segfault)
 parametro tipo PARAM (repassado), tanto inteiro quanto ponteiro
 parametro tipo FIX, inteiro (movl 32 bits) e ponteiro (movabsq 64 bits)
