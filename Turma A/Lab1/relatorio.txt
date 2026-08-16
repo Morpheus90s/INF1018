@@ -1,0 +1,9 @@
+No laboratório aprendi a compilar e rodar programas no Linux via terminal usando o gcc.
+Notei que o uso do ./ é obrigatório para rodar o executável porque a pasta atual não está no PATH do sistema.
+Ao separar o código em dois arquivos (ex2.c e labaux.c), entendi como funciona o processo de compilação separada e ligação.
+No teste do ex3.c, vi que esquecer o cabeçalho da função gera warnings e quebra o cálculo do programa,
+pois o compilador perde a referência dos tipos corretos de entrada e retorno.
+Por fim, rodando o ex4.c com a função dump, consegui inspecionar a memória byte a byte.
+Concluí que um int ocupa 4 bytes e que a nossa arquitetura é Little Endian,
+já que o valor mais baixo ficou no início.
+Também observei a diferença entre o número 1 e o caractere '1', além do caractere nulo \0 que encerra a string "1" com um byte zero no final.
