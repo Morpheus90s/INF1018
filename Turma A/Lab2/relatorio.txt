@@ -1,0 +1,7 @@
+No laboratório aprendi que a funcao dump ira imprimir a posicao da memoria 
+para cada bit e o seu conteudo em hex e que cada tipo de variavel
+possui um tamanho especifico (short = 2, int = 4, long = 8, char = 1) e estão em Little-Endian.
+Aprendi que a funcao 'strinng2num' converte uma string para um numero,
+onde podemos fazer operacoes com o mesmo. Com a tabela ASCII podemos 
+fazer essa conversao entre o caracteres e um numero inteiro feito em cada iteracao
+'for((; *s; s++)'. 
