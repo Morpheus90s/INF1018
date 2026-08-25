@@ -1,0 +1,3 @@
+Nesse relatorio aprender como fazer operacoes bit a bit com &, | , ~,  e ^, também o deslocamento de bits
+sendo para manipular a variavel bit a bit, como formatar com a saida hex. E por fim como usar a mascara 
+para manter ou 'apagar' um bit.
