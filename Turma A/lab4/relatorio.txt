@@ -1,0 +1,10 @@
+Na primeira parte colocar 150 em um char estourou o limite e virou -106 (96 em hex).
+Já os números negativos de short s = -3 e int i = -151 viraram 0xfffd e 0xffffff69
+por causa do complemento a 2. Na memória, eles aparecem invertidos: fd ff e 69 ff ff ff.
+Depois, vimos que short l = -32765 e unsigned short k = 32771 são salvos de forma idêntica na memória (0x8003),
+provando que o sinal é só uma regra de interpretação do código.Para fazer a função xbyte,
+jogamos o byte escolhido para o topo esquerdo usando (3 - bytenum) * 8 posições.
+Depois, jogamos ele de volta 24 bits para a direita com um cast para int.
+Isso faz o processador copiar o bit de sinal para o resto do espaço vazio automaticamente.
+Quando você compara um int com um unsigned int,
+o C transforma o número negativo em um positivo gigante (fazendo -1 < 2 virar falso). 
