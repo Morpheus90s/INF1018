@@ -1,0 +1,6 @@
+Neste laboratório, estudei como a memória é alocada no pc.
+Utilizei uma função chamada dump para ler os bytes e entender o impacto do alinhamento de memória.
+Descobri que o compilador adiciona espaços vazios entre as variáveis dentro de uma struct para que
+o processador consiga ler os dados de forma mais rápida.
+Analisei como diferentes tipos de dados (como char, int, long e union)
+alteram o tamanho final das estruturas.
