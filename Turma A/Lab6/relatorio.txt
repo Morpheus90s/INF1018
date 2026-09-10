@@ -1,0 +1,14 @@
+Nesse laboratório, traduzi programas em C
+para Assembly x86-64 utilizando registradores
+e operações.No primeiro exercício,
+implementei a soma acumulada do array utilizando
+a instrução addl (sufixo l para inteiros de 32 bits)
+e controlei o ponteiro com addq
+(sufixo q para endereços de 64 bits em %r12).
+No segundo exercício, implementei a condição
+para filtrar números pares utilizando a instrução lógica
+testl $1, %eax combinada com o desvio condicional jnz.
+Erro: Inicialmente, o programa gerou um erro de Segmentation fault.
+Descobri que ocorria por o uso incorreto de um sufixo addl
+em um registrador de 64 bits (%r12)
+e o desalinhamento da pilha.
