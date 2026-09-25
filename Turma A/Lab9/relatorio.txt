@@ -1,0 +1,7 @@
+fiz uma funcao simples que somava tres inteiros pegando os valores direto dos registradores %edi, %esi e %edx e devolvendo
+o resultado no %eax. Depois, criei a função do fatorial usando recursao,
+onde precisei salvar o valor de n na pilha antes de cada chamada recursiva para nao
+perder o dado no meio do caminho. Por fim, na função foo, fiz a varredura de um
+array calculando o endereço de cada elemento dinamicamente de acordo com o tamanho
+do tipo inteiro. Para dar certo, usei os registradores %rbx e %r12 para guardar
+o indice e o acumulador da soma em seguranca dentro do loop.
