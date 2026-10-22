@@ -1,0 +1,10 @@
+explorei vulnerabilidades de buffer overflow na pilha de execução
+utilizando o programa bufbomb. Inicialmente, desativei as proteções
+do sistema e do compilador para garantir endereços estáticos e
+execução de código na pilha. No primeiro exercício, desviei o fluxo
+do programa sobrescrevendo o endereço de retorno da função getbuf com o
+endereço da função danger (0x401206). No segundo passo, evitei o Segmentation
+Fault adicionando logo em seguida o endereço de retorno para a função smoke (0x401267).
+Por fim, injetei instruções em código de máquina no próprio buffer para carregar
+o argumento 0x01020304 no registrador %edi e desviei a execução com sucesso para
+a função fizz (0x401288).
