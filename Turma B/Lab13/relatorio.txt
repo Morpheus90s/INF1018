@@ -1,0 +1,4 @@
+extrai seus opcodes via objdump para execucao direta em memoria
+atraves de ponteiros de função. Ao utilizar instrucoes de desvio (call e jmp),
+implementamos o conceito de relocacao dinamica calculando programaticamente
+o deslocamento (PC-relative) em formato Little-Endian em relaçao ao endereço da proxima instrucao.
