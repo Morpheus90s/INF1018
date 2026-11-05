@@ -1,0 +1,6 @@
+implementei as funcoes float2 e int2float operando diretamente sobre a estrutura binaria do padrao IEEE 754 de precisao simples
+usando uma union e mascaras de bits. No float2, tratei as condicoes de contorno de numeros normais, desnormalizados e infinitos.
+No int2float, isolei o sinal, encontrei o bit mais significativo para definir o expoente com bias e alinhei os bits restantes na
+fracao. A maior dificuldade foi compreender como o bit implícito da mantissa se comporta no deslocamento e manipular o valor absoluto
+de INT_MIN sem estourar o limite de variaveis sinalizadas. Os testes validados contra o cast nativo confirmaram o sucesso da
+implementacao.
