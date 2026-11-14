@@ -40,7 +40,7 @@ void gera_codigo(FILE *f, unsigned char code[], funcp *entry) {
         
         // pega as strings da linha ignorando espacos
         int n = sscanf(linha, "%s %s %s %s %s", cmd, p1, p2, p3, p4);
-        if (n == 0) continue;
+        if (n < 1) continue;
 
         if (strcmp(cmd, "function") == 0) {
             funcs[q_funcs] = code + idx;
