@@ -6,9 +6,6 @@
 #include <stdlib.h>
 #include "gera_codigo.h"
 
-/* Constante para a func gera_codigo.c */
-const char* const sig_ceb = "CEB";
-
 // joga o operando (cte, p0 ou vX) pro registrador (0=eax, 1=ecx, 2=edx, 7=edi)
 static void le_op(char *op, int reg, unsigned char *code, int *idx) {
     if (op[0] == '$') { // cte
