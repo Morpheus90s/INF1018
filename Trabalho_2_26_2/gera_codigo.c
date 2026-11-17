@@ -1,4 +1,4 @@
-/* Nome*/
+/* Pedro Augusto Beserra da Silva - Matricula: 2321374 - Turma: 3WB  */
 /* Nome */
 
 #include <stdio.h>

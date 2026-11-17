@@ -2,7 +2,7 @@ INF1018 - Trabalho de Software Basico (2026.2)
 Gerador de Codigo com Funcoes (LBS)
 
 Integrantes:
-- Nome_do_Aluno1 - Matricula: XXXXXXX - Turma: XXX
+Pedro Augusto Beserra da Silva - Matricula: 2321374 - Turma: 3WB  
 - Nome_do_Aluno2 - Matricula: XXXXXXX - Turma: XXX
 
 
