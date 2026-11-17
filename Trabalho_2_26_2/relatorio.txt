@@ -7,15 +7,14 @@ Integrantes:
 
 
 1. O que esta funcionando:
-O gerador de codigo esta funcionando por completo, atendendo a todas as regras da linguagem LBS:
-- Leitura do arquivo fonte linha por linha e separacao dos comandos e operandos.
-- Montagem do prologo e epilogo padrao na pilha (alocando 32 bytes para manter o alinhamento de 16 bytes exigido pelo Linux).
-- Uso das ate 5 variaveis locais (v0 a v4) alocadas na pilha (-4(%rbp) ate -20(%rbp)).
-- Salvamento do parametro p0 (%edi) na pilha (-24(%rbp)) logo no inicio da funcao, para nao perder o valor dele quando acontecerem chamadas recursivas ou de outras funcoes.
-- Operacoes aritmeticas (+, -, *) funcionando com qualquer combinacao de variaveis, parametro p0 e constantes positivas ou negativas.
-- Retorno simples (ret) e retorno condicional (zret), calculando certinho a distancia do pulo (jne).
-- Chamadas de funcoes (call) passando o argumento no %edi, pegando o retorno no %eax e guardando o endereco da ultima funcao lida no ponteiro entry.
-
+Tudo que foi pedido no enunciado esta funcionando:
+- Leitura do arquivo .lbs linha por linha usando fgets e sscanf para separar os comandos.
+- Prologo e epilogo da funcao (abrindo 32 bytes na pilha para manter o alinhamento de 16 bytes).
+- Alocacao das 5 variaveis locais (v0 ate v4) na pilha, indo de -4(%rbp) ate -20(%rbp).
+- Backup do parametro p0 (%edi) na pilha em -24(%rbp) logo que a funcao comeca, pra ele nao ser sobrescrito quando der call.
+- Contas de +, - e * funcionando com variaveis, p0 e constantes (positivas e negativas).
+- Retorno normal (ret) e condicional (zret), calculando o offset do pulo (jne) certinho.
+- Chamada de funcoes (call) jogando o argumento no %edi, pegando o retorno no %eax e devolvendo o endereco da ultima funcao no entry.
 
 2. O que nao esta funcionando (e problemas resolvidos nos testes):
 Atualmente tudo que testamos esta rodando sem erros.
