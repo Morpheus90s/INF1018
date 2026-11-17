@@ -1,0 +1,87 @@
+INF1018 - Trabalho de Software Basico (2026.2)
+Gerador de Codigo com Funcoes (LBS)
+
+Integrantes:
+- Nome_do_Aluno1 - Matricula: XXXXXXX - Turma: XXX
+- Nome_do_Aluno2 - Matricula: XXXXXXX - Turma: XXX
+
+
+1. O que esta funcionando:
+O gerador de codigo esta funcionando por completo, atendendo a todas as regras da linguagem LBS:
+- Leitura do arquivo fonte linha por linha e separacao dos comandos e operandos.
+- Montagem do prologo e epilogo padrao na pilha (alocando 32 bytes para manter o alinhamento de 16 bytes exigido pelo Linux).
+- Uso das ate 5 variaveis locais (v0 a v4) alocadas na pilha (-4(%rbp) ate -20(%rbp)).
+- Salvamento do parametro p0 (%edi) na pilha (-24(%rbp)) logo no inicio da funcao, para nao perder o valor dele quando acontecerem chamadas recursivas ou de outras funcoes.
+- Operacoes aritmeticas (+, -, *) funcionando com qualquer combinacao de variaveis, parametro p0 e constantes positivas ou negativas.
+- Retorno simples (ret) e retorno condicional (zret), calculando certinho a distancia do pulo (jne).
+- Chamadas de funcoes (call) passando o argumento no %edi, pegando o retorno no %eax e guardando o endereco da ultima funcao lida no ponteiro entry.
+
+
+2. O que nao esta funcionando (e problemas resolvidos nos testes):
+Atualmente tudo que testamos esta rodando sem erros.
+
+Problema que tivemos durante o desenvolvimento:
+- Quando colocamos uma linha em branco entre duas funcoes no arquivo .lbs, o programa dava erro de "Illegal instruction". Descobrimos que o sscanf retornava -1 na linha vazia e nao limpava as strings da linha anterior, fazendo o codigo ler um "end" repetido e baguncar o indice das funcoes. Resolvemos isso zerando os vetores de texto antes de cada sscanf e ignorando a linha se o retorno fosse menor ou igual a zero.
+
+
+3. Exemplos de funcoes LBS testadas:
+
+Teste 1 - Constantes negativas e contas basicas:
+function
+v0 = p0 * $-2
+v1 = v0 - $-10
+ret v1
+end
+-> Passando p0 = 5: retornou 0 (Funcionou)
+
+Teste 2 - Usando todas as 5 variaveis locais:
+function
+v0 = p0 + $1
+v1 = v0 + $2
+v2 = v1 + $3
+v3 = v2 + $4
+v4 = v3 + p0
+ret v4
+end
+-> Passando p0 = 10: retornou 30 (Funcionou)
+
+Teste 3 - Varios zret na mesma funcao:
+function
+zret p0 $100
+v0 = p0 - $1
+zret v0 $200
+v1 = p0 - $2
+zret v1 $300
+ret p0
+end
+-> Passando p0 = 2: retornou 300 (Funcionou)
+-> Passando p0 = 9: retornou 9 (Funcionou)
+
+Teste 4 - Duas funcoes (soma dos quadrados do enunciado):
+function
+v0 = p0 * p0
+ret v0
+end
+function
+zret p0 $0
+v0 = p0 - $1
+v1 = call 0 p0
+v0 = call 1 v0
+v0 = v0 + v1
+ret v0
+end
+-> Passando p0 = 5: retornou 55 (Funcionou)
+
+Teste 5 - Recursao dupla (Fibonacci):
+function
+zret p0 $0
+v0 = p0 - $1
+zret v0 $1
+v1 = p0 - $1
+v2 = p0 - $2
+v3 = call 0 v1
+v4 = call 0 v2
+v0 = v3 + v4
+ret v0
+end
+-> Passando p0 = 7: retornou 13 (Funcionou)
