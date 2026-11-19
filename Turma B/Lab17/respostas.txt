@@ -1,0 +1,225 @@
+INF1018 - Software Básico
+Exercícios de Revisão
+
+========================================================================
+QUESTÃO 1 - Dump de Memória
+========================================================================
+
+Tamanho e alinhamento da struct X:
+- double d: 8 bytes (offset 0 a 7)
+- float f: 4 bytes (offset 8 a 11)
+- short s: 2 bytes (offset 12 a 13)
+- padding: 2 bytes (offset 14 a 15, para fechar múltiplo de 8)
+Total: 16 bytes.
+
+Conversões:
+- d = -4.5  -> 0xc012000000000000
+- f = 9.75  -> 0x411c0000
+- s = -11   -> 0xfff5
+
+Saída do programa (em little-endian):
+0x601040 - 00
+0x601041 - 00
+0x601042 - 00
+0x601043 - 00
+0x601044 - 00
+0x601045 - 00
+0x601046 - 12
+0x601047 - c0
+0x601048 - 00
+0x601049 - 00
+0x60104a - 1c
+0x60104b - 41
+0x60104c - f5
+0x60104d - ff
+0x60104e - PP
+0x60104f - PP
+
+
+========================================================================
+QUESTÃO 2 - Função foo em Assembly
+========================================================================
+
+--- foo.s ---
+.text
+.globl foo
+foo:
+    pushq %rbp
+    movq  %rsp, %rbp
+
+    negl     %edi
+    cvtsi2sd %edi, %xmm1
+    mulsd    %xmm1, %xmm0
+
+    leave
+    ret
+
+--- main_foo.c ---
+#include <stdio.h>
+
+double foo(double a, int b);
+
+int main(void) {
+    printf("foo(2.5, 4)   = %.2f\n", foo(2.5, 4));
+    printf("foo(-3.0, -5) = %.2f\n", foo(-3.0, -5));
+    printf("foo(10.0, 0)  = %.2f\n", foo(10.0, 0));
+    return 0;
+}
+
+
+========================================================================
+QUESTÃO 3 - Função pack em Assembly
+========================================================================
+
+Layout da struct X:
+- vi: offset 0 (4 bytes) + 4 bytes de padding
+- vd: offset 8 (8 bytes)
+- next: offset 16 (8 bytes)
+Total: 24 bytes.
+
+--- pack.s ---
+.text
+.globl pack
+pack:
+    pushq %rbp
+    movq  %rsp, %rbp
+    subq  $16, %rsp
+    movq  %rbx, -8(%rbp)
+
+    movq  %rdi, %rbx
+    xorpd %xmm0, %xmm0
+    movsd %xmm0, -16(%rbp)
+
+loop_pack:
+    cmpq  $0, %rbx
+    je    fim_pack
+
+    movsd 8(%rbx), %xmm0
+    movl  0(%rbx), %edi
+    call  foo
+
+    addsd -16(%rbp), %xmm0
+    movsd %xmm0, -16(%rbp)
+
+    movq  16(%rbx), %rbx
+    jmp   loop_pack
+
+fim_pack:
+    movsd -16(%rbp), %xmm0
+    movq  -8(%rbp), %rbx
+    leave
+    ret
+
+--- main_pack.c ---
+#include <stdio.h>
+
+struct X {
+    int vi;
+    double vd;
+    struct X *next;
+};
+
+double pack(struct X *px);
+
+int main(void) {
+    struct X n3 = {2, 5.0, NULL};
+    struct X n2 = {-3, 4.0, &n3};
+    struct X n1 = {1, 10.5, &n2};
+
+    printf("Resultado pack: %.2f\n", pack(&n1));
+    return 0;
+}
+
+
+========================================================================
+QUESTÃO 4 - Função pack1 em Assembly
+========================================================================
+
+Layout da struct X1:
+- vi: offset 0 (4 bytes)
+- vf: offset 4 (4 bytes)
+Total: 8 bytes (sem padding).
+
+--- pack1.s ---
+.text
+.globl pack1
+pack1:
+    pushq %rbp
+    movq  %rsp, %rbp
+    subq  $32, %rsp
+    movq  %rbx, -8(%rbp)
+    movq  %r12, -16(%rbp)
+    movq  %r13, -24(%rbp)
+
+    movq  %rdi, %rbx
+    movl  %esi, %r13d
+    xorl  %r12d, %r12d
+
+    xorpd %xmm0, %xmm0
+    movsd %xmm0, -32(%rbp)
+
+loop_pack1:
+    cmpl  %r13d, %r12d
+    jge   fim_pack1
+
+    cvtss2sd 4(%rbx, %r12, 8), %xmm0
+    movl     0(%rbx, %r12, 8), %edi
+    call     foo
+
+    addsd -32(%rbp), %xmm0
+    movsd %xmm0, -32(%rbp)
+
+    incl  %r12d
+    jmp   loop_pack1
+
+fim_pack1:
+    movsd -32(%rbp), %xmm0
+    movq  -24(%rbp), %r13
+    movq  -16(%rbp), %r12
+    movq  -8(%rbp), %rbx
+    leave
+    ret
+
+--- main_pack1.c ---
+#include <stdio.h>
+
+struct X1 {
+    int vi;
+    float vf;
+};
+
+double pack1(struct X1 *px, int n);
+
+int main(void) {
+    struct X1 vet[3] = {
+        {2, 3.5f},
+        {-4, 2.0f},
+        {5, 1.0f}
+    };
+
+    printf("Resultado pack1: %.2f\n", pack1(vet, 3));
+    return 0;
+}
+
+
+========================================================================
+QUESTÃO 5 - Tabela de Símbolos (nm) e Ligação
+========================================================================
+
+Símbolos de arq1.o:
+- Exportados (definidos no módulo):
+  * g (T - seção de texto/código)
+  * buff (B - seção BSS, variável global inicializada com NULL/0)
+  (Obs: k aparece como 'b' minúsculo no nm por ser static, logo é local e não exportada)
+
+- Importados (referências externas / indefinidos - U):
+  * i
+  * f
+  * strlen
+  * malloc
+  * strcpy
+  * strcat
+
+Resultado do printf("%d", k) após a ligação:
+O programa vai imprimir 0.
+Explicação: No arquivo arq1.c, a variável k foi declarada como static, o que restringe o escopo e a ligação dela apenas ao próprio arquivo arq1.o. Quando a função g altera k, ela modifica essa variável interna de arq1.o, deixando a variável global k do módulo principal intacta com o valor 0.
