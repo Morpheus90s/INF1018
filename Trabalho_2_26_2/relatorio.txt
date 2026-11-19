@@ -3,7 +3,7 @@ Gerador de Codigo com Funcoes (LBS)
 
 Integrantes:
 Pedro Augusto Beserra da Silva - Matricula: 2321374 - Turma: 3WB  
-- Nome_do_Aluno2 - Matricula: XXXXXXX - Turma: XXX
+Heloysa Suyane Conceição de Aguiar - Matricula: 2320438 - Turma: 3WA
 
 
 1. O que esta funcionando:
